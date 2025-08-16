@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import math
 
-# Input Embedding
+# -- INPUT EMBEDDING -- #
 class InputEmbedding(nn.Module):
     """Input embedding layer untuk setiap token"""
     def __init__(self, d_model: int, vocab_size: int):
@@ -20,7 +20,7 @@ class InputEmbedding(nn.Module):
         return self.embedding(x) * math.sqrt(self.d_model)
     
 
-# Positional Encoding
+# -- POSITIONAL ENCODING -- #
 class PositionalEncoding(nn.Module):
     """Positional Encoding layer"""
     def __init__(self, d_model: int, seq_len: int, dropout: float) -> None:
@@ -54,3 +54,19 @@ class PositionalEncoding(nn.Module):
     def forward(self, x):
         x = x + self.pe[:, :x.shape[1], :].requires_grad(False)
         return self.dropout(x)
+    
+
+## -- LAYER NORMALIZATION -- ##
+class LayerNormalization(nn.Module):
+    """Layer Normalization"""
+    def __inti__(self, eps: float = 1e-6) -> None:
+        super().__init__()
+        self.eps = eps
+        self.alpha = nn.Parameter(torch.ones(1)) # trainable; multiplied
+        self.bias = nn.Parameter(torch.zeros(1)) # trainable; added
+
+    def forward(self, x):
+        # cari mean dan std di d_model
+        mean = x.mean(dim = -1, keepdim= True) #
+        std = x.std(dim = - 1, keepdim = True)
+        return self.alpha * (x - mean) / (std * self.eps) + self.bias
