@@ -70,3 +70,14 @@ class LayerNormalization(nn.Module):
         mean = x.mean(dim = -1, keepdim= True) #
         std = x.std(dim = - 1, keepdim = True)
         return self.alpha * (x - mean) / (std * self.eps) + self.bias
+    
+
+## -- Multi Head Attention -- ## 
+class MultiHeadAttention(nn.Module):
+    """MHA Block"""
+    def __init__(self, d_model: int, h: int, dropout: float) -> None:
+        super().__init__()
+        self.d_model = d_model # ukuran embedding
+        self.h = h # banyaknya kepala/head
+        # d_model harus divisible oleh h
+        assert d_model % h == 0, "d_model harus divisible oleh h"
