@@ -81,3 +81,41 @@ class MultiHeadAttention(nn.Module):
         self.h = h # banyaknya kepala/head
         # d_model harus divisible oleh h
         assert d_model % h == 0, "d_model harus divisible oleh h"
+
+        self.d_k = d_model // h # ukuran setiap head
+        self.w_q = nn.Linear(d_model, d_model, bias=False) # weight query
+        self.w_k = nn.Linear(d_model, d_model, bias=False) # weight key
+        self.w_v = nn.Linear(d_model, d_model, bias=False) # weight value
+        self.fc = nn.Linear(d_model, d_model, bias=False) # output
+
+        self.dropout = nn.Dropout(dropout) # dropout
+
+    # attention
+    @staticmethod
+    def attention(query, key, value, mask, dropout: nn.Dropout):
+        """Self Attention mechanism"""
+        # ambil dimensi terakhir sebagai d_k
+        d_k = query.shape[-1]
+
+        # scaled dot-product attention : Q @ K^T / SQRT(d_k)
+        attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
+        # shape : (bh, h, seq_len, seq_len)
+        
+        # check mask
+        if mask is not None:
+            attention_scores.masked_fill_(mask == 0, -1e9) # isi 0 dengan -inf
+        
+        # apply softmax 
+        attention_scores = attention_scores.softmax(dim = -1) 
+        
+        # dropout
+        if dropout is not None:
+            attention_scores = dropout(attention_scores) 
+            
+        # (bh, h, seq_len, seq_len) -> (bh, h, seq_len, d_k), attention_scores
+        return (attention_scores @ value), attention_scores
+    
+    def forward(self, q, k, v, mask):
+        query = self.w_q(q)     # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
+        key = self.w_k(k)       # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
+        value = self.w_v(v)     # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
