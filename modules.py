@@ -116,6 +116,24 @@ class MultiHeadAttention(nn.Module):
         return (attention_scores @ value), attention_scores
     
     def forward(self, q, k, v, mask):
-        query = self.w_q(q)     # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
-        key = self.w_k(k)       # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
-        value = self.w_v(v)     # (bh, seq_len, d_model) -> (bh, seq_len, d_k)
+        # masuk ke masing-masing weight
+        query = self.w_q(q)     # (bh, seq_len, d_model) -> (bh, seq_len, d_model)
+        key = self.w_k(k)       # (bh, seq_len, d_model) -> (bh, seq_len, d_model)
+        value = self.w_v(v)     # (bh, seq_len, d_model) -> (bh, seq_len, d_model)
+
+        # view dan transpose
+        # (bh, seq_len, d_model) -> (bh, seq_len, h, d_k) -> (bh, h, seq_len, d_k)
+        query = query.view(query.shape[0], query.shape[1], self.h, self.d_k).transpose(1, 2)
+        key = key.view(key.shape[0], key.shape[1], self.h, self.d_k).transpose(1, 2)
+        value = value.view(value.shape[0], value.shape[1], self.h, self.d_k).transpose(1, 2)
+
+        # hitung attention
+        x, self.attention_scores = MultiHeadAttention.attention(query, key, value,  mask, self.dropout)
+
+        # concat
+        # (bh, h, seq_len, d_k) -> (bh, seq_len, h, d_k) -> (bh, seq_len, d_model)
+        x = x.transpose(1, 2).contiguous().view(x.shape[0], -1, self.h * self.d_k)
+
+        # masukkan ke fc
+        x = self.fc(x)
+        return x
