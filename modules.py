@@ -141,12 +141,21 @@ class MultiHeadAttention(nn.Module):
 
 ## -- RESIDUAL CONNECTION -- ##
 class ResidualConnection(nn.Module):
-    """ResNet"""
+    """ResNet dengan LayerNorm"""
     def __init__(self, dropout: float, features: int) -> None:
+        """
+        Args:
+            dropout (float): dropout
+            features (int): jumlah fitur input.
+        """
         super().__init__()
         self.dropout = nn.Dropout(dropout)
         self.norm = LayerNormalization(features)
 
     def forward(self,  x, sublayer):
+        """
+        Args:
+            sublayer: Sublayer function.
+        """
         # return x + self.dropout(sublayer(self.norm(x))) # pre-norm
         return self.norm(x + self.dropout(sublayer(x)))  # residual connection + layer normalization
