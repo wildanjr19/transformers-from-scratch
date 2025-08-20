@@ -137,3 +137,16 @@ class MultiHeadAttention(nn.Module):
         # masukkan ke fc
         x = self.fc(x)
         return x
+    
+
+## -- RESIDUAL CONNECTION -- ##
+class ResidualConnection(nn.Module):
+    """ResNet"""
+    def __init__(self, dropout: float, features: int) -> None:
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+        self.norm = LayerNormalization(features)
+
+    def forward(self,  x, sublayer):
+        # return x + self.dropout(sublayer(self.norm(x))) # pre-norm
+        return self.norm(x + self.dropout(sublayer(x)))  # residual connection + layer normalization
