@@ -76,6 +76,7 @@ class LayerNormalization(nn.Module):
 class FeedForwardBlock(nn.Module):
     """Position-wise Feed-Forward Networks"""
     def __init__(self, d_model: int, d_ff: int, dropout: float) -> None:
+        super().__init__()
         """
         Args:
             d_model (int) : Dimensi model/embedding
