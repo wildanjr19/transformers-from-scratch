@@ -87,6 +87,7 @@ class FeedForwardBlock(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
+        # (bh, seq_len, d_model) -> (bh, seq_len, d_ff) -> (bh, seq_len, d_model)
         x = torch.relu(self.linear_1(x))
         x = self.dropout(x)
         x = self.linear_2(x)
