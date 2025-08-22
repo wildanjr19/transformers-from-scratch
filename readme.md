@@ -3,6 +3,7 @@
 
 - `SelfAttention.py` Implementasi Self Attention Mechanism yang dipakai di Transformers
 - `modules.py` Berisi layer-layer pada model
+- `encoder.py` Bagian encodere dari model
 
 ## Source
 - Attention is All You Need Paper
