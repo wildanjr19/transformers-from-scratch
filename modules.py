@@ -72,6 +72,25 @@ class LayerNormalization(nn.Module):
         return self.alpha * (x - mean) / (std * self.eps) + self.bias
     
 
+## -- FFN -- ##
+class FeedForwardBlock(nn.Module):
+    """Position-wise Feed-Forward Networks"""
+    def __init__(self, d_model: int, d_ff: int, dropout: float) -> None:
+        """
+        Args:
+            d_model (int) : Dimensi model/embedding
+            d_ff (int) : Dimensi inner layer 
+        """
+        self.linear_1 = nn.Linear(d_model, d_ff) # layer pertama
+        self.linear_2 = nn.Linear(d_ff, d_model) # layer kedua
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        x = torch.relu(self.linear_1(x))
+        x = self.dropout(x)
+        x = self.linear_2(x)
+        return x
+
 ## -- Multi Head Attention -- ## 
 class MultiHeadAttention(nn.Module):
     """MHA Block"""
