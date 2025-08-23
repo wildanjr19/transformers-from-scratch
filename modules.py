@@ -180,3 +180,14 @@ class ResidualConnection(nn.Module):
         """
         # return x + self.dropout(sublayer(self.norm(x))) # pre-norm
         return self.norm(x + self.dropout(sublayer(x)))  # residual connection + layer normalization
+    
+
+## -- PROJECTION LAYER -- ##
+class ProjectionLayer(nn.Module):
+    """ProjectionLayer -> mengembalikan ke token"""
+    def __init__(self, d_model: int, vocab_size: int) -> None:
+        super().__init__()
+        self.proj = nn.Linear(d_model, vocab_size)
+
+    def forward(self, x):
+        return torch.log_softmax(self.proj(x), dim= -1)
