@@ -26,3 +26,20 @@ class DecoderBlock(nn.Module):
         # fase 3
         x = self.add_norm[2](x, lambda x: self.feed_forward_block(x))
         return x
+    
+class Decoder(nn.Module):
+    """Decoder -> tumpukan beberapa DecoderBlock"""
+    def __init__(self, features: int, layers: nn.ModuleList):
+        """
+        Args:
+            features (int) : fitur
+            layers (Module List) : daftar lapisan DecoderBlock
+        """
+        super().__init__()
+        self.layers = layers
+        self.norm = LayerNormalization(features)
+
+    def forward(self, x, encoder_output, src_mask, tgt_mask):
+        for layer in self.layers:
+            x = layer(x, encoder_output, src_mask, tgt_mask)
+        return self.norm(x)
