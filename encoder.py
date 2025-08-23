@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from modules import MultiHeadAttention, FeedForwardBlock, ResidualConnection
+from modules import MultiHeadAttention, FeedForwardBlock, ResidualConnection, LayerNormalization
 
 class EncoderBlock(nn.Module):
     """Encoder Block"""
@@ -23,3 +23,22 @@ class EncoderBlock(nn.Module):
         x = self.add_norm[1](x, lambda x: self.feed_forward_block(x))
 
         return x
+
+
+class Encoder(nn.Module):
+    """Encoder -> tumpukan beberapa EncoderBlock"""
+    def __init__(self, features: int, layers: nn.ModuleList) -> None:
+        super().__init__()
+        """
+        Args:
+            features (int) : fitur
+            layers (Module List) : daftar lapisan EncoderBlock
+        """
+        self.layers = layers
+        self.norm = LayerNormalization(features)
+
+    def forward(self, x, mask):
+        for layer in self.layers:
+            x = layer(x, mask)
+
+        return self.norm(x)
