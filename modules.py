@@ -184,7 +184,7 @@ class ResidualConnection(nn.Module):
 
 ## -- PROJECTION LAYER -- ##
 class ProjectionLayer(nn.Module):
-    """ProjectionLayer -> mengembalikan ke token"""
+    """ProjectionLayer -> mengembalikan ke token (input dari decoder/target)"""
     def __init__(self, d_model: int, vocab_size: int) -> None:
         super().__init__()
         self.proj = nn.Linear(d_model, vocab_size)
