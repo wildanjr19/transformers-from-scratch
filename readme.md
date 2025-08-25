@@ -5,6 +5,7 @@
 - `modules.py` Berisi layer-layer pada model
 - `encoder.py` Bagian encoder dari model
 - `decoder.py` Bagian decoder dari model
+- `main.py` Full version dari model
 
 ## Source
 - Attention is All You Need Paper
