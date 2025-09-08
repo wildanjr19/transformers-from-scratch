@@ -11,7 +11,7 @@ def causal_mask(size: int):
     return mask == 0
 
 class BilingualDataset(Dataset):
-    """"""
+    """Kelas dataset"""
     def __init__(self, ds, tokenizer_src,  tokenizer_tgt, src_lang, tgt_lang, seq_len) :
         super().__init__()
         self.ds = ds
@@ -47,3 +47,54 @@ class BilingualDataset(Dataset):
         # ubah dari teks menjadi token
         enc_input_tokens = self.tokenizer_src.encode(src_text).ids
         dec_input_tokens = self.tokenizer_tgt.encode(tgt_text).ids
+
+        """Kurangi kalimat untuk menambahkan token khusus<s> dan </s> untuk input, dan hanya </s> untuk target"""
+        # encoder (<s> dan </s>)
+        enc_num_padding_tokens = self.seq_len - len(enc_input_tokens) - 2
+        # decoder (</s>)
+        dec_num_padding_tokens = self.seq_len - len(dec_input_tokens) - 1
+
+        # pastikan padding token tidak negatif, karena bisa saja teksnya terlalu panjang
+        if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
+            raise ValueError("Kalimat terlalu panjang")
+        
+        """Menambahkan token khusus"""
+        # tambahkan token khusus encoder
+        encoder_input = torch.cat([
+            self.sos_token,
+            torch.tensor(enc_input_tokens, dtype=torch.int64),
+            self.eos_token,
+            torch.tensor([self.pad_token] * enc_num_padding_tokens, dtype=torch.int64)
+        ], dim=0)
+
+        # tambahkan token khusus decoder
+        decoder_input = torch.cat([
+            self.sos_token,
+            torch.tensor(dec_input_tokens, dtype=torch.int64),
+            torch.tensor([self.pad_token] * dec_num_padding_tokens, dtype=torch.int64)
+        ], dim=0)
+
+        # target hanya </s> dan padding
+        label = torch.cat([
+            torch.tensor(dec_input_tokens, dtype=torch.int64),
+            self.eos_token,
+            torch.tensor([self.pad_token] * dec_num_padding_tokens, dtype=torch.int64)
+        ], dim=0)
+
+        # pastikan ukuran sudah sesuai dengan seq_len -> [seq_len]
+        assert encoder_input.size(0) == self.seq_len
+        assert decoder_input.size(0) == self.seq_len
+        assert label.size(0) == self.seq_len
+
+        # kembalikan dalam bentuk dictinary
+        """encoder_mask dan decoder_mask masking boolean"""
+        return {
+            "encoder_input" : encoder_input,                                                    # [seq_len]
+            "decoder_input" : decoder_input,                                                    # [seq_len]                             
+            "encoder_mask" : (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(), # [1, 1, seq_len]
+            "decoder_mask" : (decoder_input != self.pad_token).unsqueeze(0).int() & causal_mask(decoder_input.size(0)), # [1, seq_len] & [1, seq_len, seq_len]
+            "label" : label, # [seq_len]
+            "src_text" : src_text,
+            "tgt_text" : tgt_text
+        }
+
