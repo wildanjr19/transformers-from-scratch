@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from data.datasets import load_dataset
+from datasets import load_dataset
 
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
@@ -10,39 +10,15 @@ from tokenizers.pre_tokenizers import Whitespace
 import os
 from pathlib import Path
 
-# dapatkan semua data (get_all_sentences)
-# latih tokenizer (get_or_build_tokenizer)
-
-# schema dataset ada dua kolom ['english', 'indonesian']
-
-def get_all_sentences(ds, lang, two_col_map = None, translation_key = "translation"):
-    """
-    Ambil semua data dari dataset
-    Args:
-        - lang : en atau id
-        - two_col_map : mapping jika menggunakan schema dua kolom
-    """
-    # default mapping
-    if two_col_map is None:
-        two_col_map = { "en": "english", "id": "indonesian"}
-
-    col_name = two_col_map.get(lang, lang)
-
+def get_all_sentences(ds, lang):
     for item in ds:
-        text = None
-        if translation_key in item and isinstance(item[translation_key], dict) and lang in item[translation_key]:
-            text = item[translation_key][lang]
-        elif col_name in item:
-            text = item[col_name]
-        elif lang in item:
-            text = item[lang]
-
-        if text:
-            t = text.strip()
-            if t:
-                yield t
+        yield item['translation'][lang]
 
 def get_or_build_tokenizer(config, ds, lang):
+    """
+    Fungsi untuk membuat atau memuat tokenizer
+    Jika tokenizer belum ada, maka buat dan latih tokenizer baru menggunakan WordLevel
+    """
     tokenizer_path = Path(config['tokenizer_file'].format(lang))
     if not Path.exists(tokenizer_path):
         tokenizer = Tokenizer(WordLevel(unk_token="[UNK]"))
