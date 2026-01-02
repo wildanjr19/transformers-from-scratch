@@ -1,3 +1,10 @@
+"""
+Script utama untuk proses pelatihan model
+
+    get_model   : fungsi untuk membangun model dari script transformers_model.py
+    train_model : fungsi utama untuk proses pelatihan model
+"""
+
 import torch
 import torch.nn as nn
 
@@ -9,6 +16,8 @@ from torch.utils.tensorboard import SummaryWriter
 
 from pathlib import Path
 from tqdm import tqdm
+import warnings
+warnings.filterwarnings("ignore")
 
 # our scripts
 from transformers_model import build_transformers
@@ -112,3 +121,12 @@ def train_model(config):
             optimizer.zero_grad(set_to_none=True)
 
             global_step += 1
+        
+        # simpan model tiap epoch
+        model_filename = get_weights_file(config, f"{epoch:02d}")
+        torch.save({
+            'epoch' : epoch,
+            'model_state_dict' : model.state_dict(),
+            'optimizer_state_dict' : optimizer.state_dict(),
+            'global_step' : global_step
+        }, model_filename)
