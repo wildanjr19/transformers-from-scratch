@@ -88,3 +88,27 @@ def train_model(config):
             decoder_input = batch['decoder_input'].to(device) # (b, seq_len)
             encoder_mask = batch['encoder_mask'].to(device) # (b, 1, 1, seq_len)
             decoder_mask = batch['decoder_mask'].to(device) # (b, 1, seq_len, seq_len)
+
+            # masukkan semua data input ke model
+            encoder_output = model.encode(encoder_input, encoder_mask) # (b, seq_len, d_model)
+            decoder_output = model.decode(encoder_output, encoder_mask, decoder_input, decoder_mask) # (b, seq_len, d_model)
+            projection_output = model.projection(decoder_output) # (b, seq_len, vocab_size)
+
+            # dapatkan label/target dari batch
+            label = batch['label'].to(device) # (b, seq_len)
+
+            # hitung loss
+            loss = loss_fn(projection_output.view(-1, tokenizer_tgt.get_vocab_size()), label.view(-1))
+
+            # logging
+            writer.add_scalar('Train Loss', loss.item(), global_step)
+            writer.flush()
+
+            # backprop
+            loss.backward()
+
+            # update
+            optimizer.step()
+            optimizer.zero_grad(set_to_none=True)
+
+            global_step += 1
