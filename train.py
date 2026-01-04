@@ -24,6 +24,7 @@ from transformers_model import build_transformers
 from datasets import BilingualDataset, causal_mask
 from config import get_config, get_weights_file
 from build_data import get_dataset
+from validation import validate_model
 
 # HF utils
 from datasets import load_dataset
@@ -121,6 +122,19 @@ def train_model(config):
             optimizer.zero_grad(set_to_none=True)
 
             global_step += 1
+        
+        # validasi tiap epoch
+        validate_model(
+            model,
+            val_loader,
+            tokenizer_src,
+            tokenizer_tgt,
+            config['seq_len'],
+            device,
+            lambda msg: train_batch_iterator.write(msg),
+            global_step,
+            writer,
+        )
         
         # simpan model tiap epoch
         model_filename = get_weights_file(config, f"{epoch:02d}")
