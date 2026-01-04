@@ -1,3 +1,7 @@
+"""
+Script berisi modul modul pada model transformers
+"""
+
 import torch
 import torch.nn as nn
 import math

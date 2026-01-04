@@ -1,5 +1,5 @@
 """
-Script utama untuk proses pelatihan model
+Script utama untuk proses pelatihan dan validasi model
 
     get_model   : fungsi untuk membangun model dari script transformers_model.py
     train_model : fungsi utama untuk proses pelatihan model

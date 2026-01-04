@@ -1,3 +1,7 @@
+"""
+Script berisi konfigurasi model untuk pelatihan
+"""
+
 from pathlib import Path
 
 def get_config():
