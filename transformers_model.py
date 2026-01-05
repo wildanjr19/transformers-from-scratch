@@ -1,3 +1,9 @@
+"""
+Script untuk mendefinisikan model transformers
+    class Transformers: mendefinisikan arsitektur model transformers
+    build_transformers: fungsi untuk membangun dan menginisialisasi model transformers
+"""
+
 import torch
 import torch.nn as nn
 from modules import *

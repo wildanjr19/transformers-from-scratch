@@ -1,12 +1,19 @@
+"""
+Script untuk mendefinisikan Encoder dan EncoderBlock
+    class EncoderBlock: mendefinisikan satu blok encoder
+    class Encoder: mendefinisikan tumpukan beberapa EncoderBlock
+"""
+
 import torch
 import torch.nn as nn
 from modules import MultiHeadAttention, FeedForwardBlock, ResidualConnection, LayerNormalization
 
 class EncoderBlock(nn.Module):
-    """Encoder Block"""
     def __init__(self, features: int, self_attention_block: MultiHeadAttention, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
         super().__init__()
         """
+        EncoderBlock -> Bagian dari Encoder, yang terdiri dari beberapa layer (self-attention, feed-forward) dengan residual connection dan layer normalization
+
         Args:
             self_attention_block : Multi head attention layer
             feed_forward_block : FFN layer
@@ -26,10 +33,11 @@ class EncoderBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    """Encoder -> tumpukan beberapa EncoderBlock"""
     def __init__(self, features: int, layers: nn.ModuleList) -> None:
         super().__init__()
         """
+        Encoder -> tumpukan beberapa EncoderBlock
+        
         Args:
             features (int) : fitur
             layers (Module List) : daftar lapisan EncoderBlock

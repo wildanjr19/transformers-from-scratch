@@ -1,3 +1,9 @@
+"""
+Script untuk helper tokenizer dari HF
+    get_all_sentences: mengambil semua kalimat dari dataset
+    get_or_build_tokenizer: membuat atau memuat tokenizer dari file tokenizer
+"""
+
 import torch
 import torch.nn as nn
 from datasets import load_dataset

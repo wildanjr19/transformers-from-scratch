@@ -1,12 +1,19 @@
+"""
+Script untuk mendefinisikan Decoder dan DecoderBlock
+    class DecoderBlock: mendefinisikan satu blok decoder
+    class Decoder: mendefinisikan tumpukan beberapa DecoderBlock
+"""
+
 import torch
 import torch.nn as nn
 from modules import MultiHeadAttention, FeedForwardBlock, ResidualConnection, LayerNormalization
 
-class DecoderBlock(nn.Module):
-    """Decoder Block"""
+class DecoderBlock(nn.Module): 
     def __init__(self, features: int, self_attention_block: MultiHeadAttention, cross_attention_block: MultiHeadAttention, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
         super().__init__()
         """
+        DecoderBlock -> Bagian dari Decoder, yang terdiri dari beberapa layer (self-attention, cross-attention, feed-forward) dengan residual connection dan layer normalization
+
         Args:
             self_attention_block : Multi head attention layer
             cross_attention_block : Multi head attention layer untuk cross attention
@@ -28,9 +35,10 @@ class DecoderBlock(nn.Module):
         return x
     
 class Decoder(nn.Module):
-    """Decoder -> tumpukan beberapa DecoderBlock"""
     def __init__(self, features: int, layers: nn.ModuleList):
         """
+        Decoder -> tumpukan beberapa DecoderBlock
+
         Args:
             features (int) : fitur
             layers (Module List) : daftar lapisan DecoderBlock
