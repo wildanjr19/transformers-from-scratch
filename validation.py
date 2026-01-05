@@ -48,7 +48,7 @@ def greedy_decode(model, source, source_msk, tokenizer_src, tokenizer_tgt, max_l
 
     return decoder_input.squeeze(0)
 
-def validate_model(model, validation_dataset, tokenizer_src, tokenizer_tgt, max_len, device, print_msg, global_state, writer, num_examples=2):
+def validate_model(model, validation_dataset, tokenizer_src, tokenizer_tgt, max_len, device, print_msg, global_step, writer, num_examples=2):
     """
     Fungsi untuk validasi pelatihan
     Args:
